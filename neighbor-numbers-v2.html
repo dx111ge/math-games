@@ -63,6 +63,41 @@
             border-radius: 20px;
             background: #fff5f8;
         }
+        .number-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .number-slot {
+            width: 80px;
+            height: 80px;
+            border: 3px dashed #ccc;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: #999;
+            background: #f9f9f9;
+        }
+        .number-slot.filled {
+            border: 3px solid #2ecc71;
+            background: #d4edda;
+            color: #2ecc71;
+        }
+        .number-slot.center {
+            background: #fff5f8;
+            border: 3px solid #f093fb;
+            color: #f5576c;
+        }
+        .position-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
         .options {
             display: flex;
             flex-wrap: wrap;
@@ -357,7 +392,20 @@
 
             gameArea.innerHTML = `
                 <div class="instruction">${instruction}</div>
-                <div class="current-number">${currentNumber}</div>
+                <div class="number-line">
+                    <div>
+                        <div class="number-slot" id="beforeSlot">?</div>
+                        <div class="position-label">before</div>
+                    </div>
+                    <div>
+                        <div class="number-slot center">${currentNumber}</div>
+                        <div class="position-label">current</div>
+                    </div>
+                    <div>
+                        <div class="number-slot" id="afterSlot">?</div>
+                        <div class="position-label">after</div>
+                    </div>
+                </div>
                 <div class="feedback" id="feedback"></div>
                 <div class="options" id="options"></div>
             `;
@@ -365,17 +413,19 @@
             const optionsDiv = document.getElementById('options');
 
             if (level === 1) {
-                // Level 1: Just show the 2 neighbors
+                // Level 1: Show 2 neighbors in RANDOM order
                 const before = currentNumber - 1;
                 const after = currentNumber + 1;
-                optionsDiv.innerHTML = `
-                    <button class="option-btn" onclick="checkAnswer(${before})">
-                        ${before}
-                    </button>
-                    <button class="option-btn" onclick="checkAnswer(${after})">
-                        ${after}
-                    </button>
-                `;
+                const options = [before, after];
+                shuffleArray(options);
+
+                options.forEach(num => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.textContent = num;
+                    btn.onclick = () => checkAnswer(num);
+                    optionsDiv.appendChild(btn);
+                });
             } else if (level === 2) {
                 // Level 2: Show 5 options (neighbors + 3 random)
                 const correctAnswers = [currentNumber - 1, currentNumber + 1];
@@ -440,6 +490,17 @@
                 btn.classList.add('correct');
                 btn.style.pointerEvents = 'none';
                 correctClicks.add(num);
+
+                // Fill in the visual slot
+                if (num === currentNumber - 1) {
+                    const beforeSlot = document.getElementById('beforeSlot');
+                    beforeSlot.textContent = num;
+                    beforeSlot.classList.add('filled');
+                } else if (num === currentNumber + 1) {
+                    const afterSlot = document.getElementById('afterSlot');
+                    afterSlot.textContent = num;
+                    afterSlot.classList.add('filled');
+                }
 
                 if (correctClicks.size === 1) {
                     showFeedback('Good! Find the other one!', '#f39c12');
