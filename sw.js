@@ -1,11 +1,11 @@
 // Service Worker for offline support
 const CACHE_NAME = 'math-games-v1';
 const urlsToCache = [
-  '/index.html',
-  '/number-order-v2.html',
-  '/neighbor-numbers-v2.html',
-  '/make-ten-v2.html',
-  '/learning-system.js'
+  '/math-games/index.html',
+  '/math-games/number-order-v2.html',
+  '/math-games/neighbor-numbers-v2.html',
+  '/math-games/make-ten-v2.html',
+  '/math-games/learning-system.js'
 ];
 
 // Install service worker and cache files
