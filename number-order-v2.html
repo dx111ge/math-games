@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Order Game</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            gap: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .level-indicator {
+            text-align: center;
+            font-size: 16px;
+            color: #764ba2;
+            margin-bottom: 20px;
+        }
+        .score {
+            text-align: center;
+            font-size: 20px;
+            color: #764ba2;
+            margin-bottom: 20px;
+        }
+        .game-area {
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .instruction {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+            font-weight: bold;
+        }
+        .numbers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .number-btn {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            font-weight: bold;
+            border: 3px solid #667eea;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .number-btn:hover {
+            transform: scale(1.1);
+            background: #f0f0f0;
+        }
+        .number-btn.correct {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+            pointer-events: none;
+        }
+        .number-btn.wrong {
+            animation: shake 0.5s;
+            background: #e74c3c;
+            color: white;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .feedback {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-align: center;
+            min-height: 30px;
+        }
+        .start-btn {
+            padding: 20px 40px;
+            font-size: 20px;
+            border: none;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 10px;
+        }
+        .start-btn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+        .level-unlock {
+            background: #f39c12;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        .stats-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            width: 280px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        .stats-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #764ba2;
+            padding-bottom: 10px;
+        }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #333;
+        }
+        .stat-label {
+            color: #666;
+        }
+        .stat-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+        .level-selector {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        .level-btn {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background: #ecf0f1;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .level-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        .level-btn.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .reset-btn {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .reset-btn:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Number Order</h1>
+        <div class="level-indicator" id="levelIndicator">Level 1: Count 0→20</div>
+        <div class="score">Score: <span id="score">0</span></div>
+        <div class="game-area" id="gameArea">
+            <div class="instruction">Click Start to begin!</div>
+            <button class="start-btn" onclick="startGame()">Start Game</button>
+        </div>
+    </div>
+
+    <div class="stats-panel">
+        <div class="stats-title">Learning Progress</div>
+        <div class="stat-row">
+            <span class="stat-label">Total Attempts:</span>
+            <span class="stat-value" id="totalAttempts">0</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Success Rate:</span>
+            <span class="stat-value" id="successRate">0%</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Concepts Mastered:</span>
+            <span class="stat-value" id="conceptsMastered">0</span>
+        </div>
+
+        <div class="level-selector">
+            <div style="font-size: 14px; color: #666; margin-bottom: 10px;">Select Level:</div>
+            <button id="level1Btn" class="level-btn active" onclick="selectLevel(1)">Level 1: Count Up 0→20</button>
+            <button id="level2Btn" class="level-btn locked" onclick="selectLevel(2)">Level 2: Count Down 20→0</button>
+            <button id="level3Btn" class="level-btn locked" onclick="selectLevel(3)">Level 3: Random Start & Direction</button>
+        </div>
+
+        <button class="reset-btn" onclick="resetProgress()">Reset Progress</button>
+    </div>
+
+    <script src="learning-system.js"></script>
+    <script>
+        const learningSystem = new LearningSystem('number-order');
+        let score = 0;
+        let expectedNumber = 0;
+        let numbers = [];
+        let startNumber = 0;
+        let endNumber = 20;
+        let currentDirection = 'up';
+
+        // Initialize
+        updateStatsDisplay();
+        updateLevelButtons();
+
+        function selectLevel(level) {
+            const unlockedLevels = learningSystem.getUnlockedLevels();
+            if (!unlockedLevels.includes(level)) {
+                return; // Can't select locked levels
+            }
+
+            if (learningSystem.setCurrentLevel(level)) {
+                updateLevelButtons();
+                updateLevelIndicator();
+            }
+        }
+
+        function updateLevelButtons() {
+            const unlockedLevels = learningSystem.getUnlockedLevels();
+            const currentLevel = learningSystem.getCurrentLevel();
+
+            [1, 2, 3].forEach(level => {
+                const btn = document.getElementById(`level${level}Btn`);
+                btn.classList.remove('active', 'locked');
+
+                if (unlockedLevels.includes(level)) {
+                    if (level === currentLevel) {
+                        btn.classList.add('active');
+                    }
+                } else {
+                    btn.classList.add('locked');
+                }
+            });
+        }
+
+        function updateLevelIndicator() {
+            const level = learningSystem.getCurrentLevel();
+            const labels = {
+                1: 'Level 1: Count Up 0→20',
+                2: 'Level 2: Count Down 20→0',
+                3: 'Level 3: Random Start & Direction'
+            };
+            document.getElementById('levelIndicator').textContent = labels[level];
+        }
+
+        function startGame() {
+            score = 0;
+            updateScore();
+
+            const level = learningSystem.getCurrentLevel();
+
+            if (level === 1) {
+                // Level 1: Always count up 0→20
+                startNumber = 0;
+                endNumber = 20;
+                currentDirection = 'up';
+            } else if (level === 2) {
+                // Level 2: Always count down 20→0
+                startNumber = 20;
+                endNumber = 0;
+                currentDirection = 'down';
+            } else if (level === 3) {
+                // Level 3: Random start and direction
+                currentDirection = Math.random() > 0.5 ? 'up' : 'down';
+                if (currentDirection === 'up') {
+                    startNumber = Math.floor(Math.random() * 15);
+                    endNumber = Math.min(startNumber + 5 + Math.floor(Math.random() * 10), 20);
+                } else {
+                    endNumber = Math.floor(Math.random() * 15) + 6;
+                    startNumber = Math.max(endNumber - 5 - Math.floor(Math.random() * 10), 0);
+                }
+            }
+
+            expectedNumber = currentDirection === 'up' ? startNumber : startNumber;
+
+            // Generate all numbers 0-20
+            numbers = Array.from({length: 21}, (_, i) => i);
+            shuffleArray(numbers);
+
+            renderGame();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function renderGame() {
+            const gameArea = document.getElementById('gameArea');
+            const direction = currentDirection === 'up' ? '↑' : '↓';
+            const instruction = currentDirection === 'up'
+                ? `Count UP: ${startNumber} → ${endNumber} ${direction}`
+                : `Count DOWN: ${startNumber} → ${endNumber} ${direction}`;
+
+            gameArea.innerHTML = `
+                <div class="instruction">${instruction}</div>
+                <div class="feedback" id="feedback"></div>
+                <div class="numbers" id="numbers"></div>
+            `;
+
+            const numbersDiv = document.getElementById('numbers');
+            numbers.forEach(num => {
+                const btn = document.createElement('button');
+                btn.className = 'number-btn';
+                btn.textContent = num;
+                btn.onclick = () => checkNumber(num, btn);
+                numbersDiv.appendChild(btn);
+            });
+        }
+
+        function checkNumber(num, btn) {
+            const conceptId = `${currentDirection}-${expectedNumber}`;
+
+            if (num === expectedNumber) {
+                btn.classList.add('correct');
+                score += 10;
+                updateScore();
+                showFeedback('Great!', '#2ecc71');
+
+                learningSystem.recordAttempt(conceptId, true);
+
+                if (currentDirection === 'up') {
+                    expectedNumber++;
+                    if (expectedNumber > endNumber) {
+                        gameWon();
+                    }
+                } else {
+                    expectedNumber--;
+                    if (expectedNumber < endNumber) {
+                        gameWon();
+                    }
+                }
+            } else {
+                btn.classList.add('wrong');
+                score = Math.max(0, score - 5);
+                updateScore();
+                showFeedback('Try again!', '#e74c3c');
+                setTimeout(() => btn.classList.remove('wrong'), 500);
+
+                learningSystem.recordAttempt(conceptId, false);
+            }
+
+            updateStatsDisplay();
+        }
+
+        function gameWon() {
+            setTimeout(() => {
+                showFeedback('You Won!', '#f39c12');
+
+                // Check if new level unlocked
+                const newLevel = learningSystem.checkLevelProgress();
+                if (newLevel) {
+                    setTimeout(() => {
+                        const gameArea = document.getElementById('gameArea');
+                        gameArea.innerHTML = `
+                            <div class="level-unlock">
+                                🎉 Level ${newLevel} Unlocked! 🎉
+                            </div>
+                            <button class="start-btn" onclick="startGame()">Continue</button>
+                        `;
+                        updateLevelButtons();
+                    }, 1000);
+                } else {
+                    setTimeout(() => startGame(), 2000);
+                }
+            }, 500);
+        }
+
+        function showFeedback(message, color) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.style.color = color;
+            setTimeout(() => feedback.textContent = '', 1000);
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+
+        function updateStatsDisplay() {
+            const stats = learningSystem.getStats();
+            document.getElementById('totalAttempts').textContent = stats.totalAttempts;
+            document.getElementById('successRate').textContent = stats.successRate + '%';
+            document.getElementById('conceptsMastered').textContent = stats.conceptsMastered;
+        }
+
+        function resetProgress() {
+            if (confirm('Reset all learning progress? This cannot be undone!')) {
+                learningSystem.reset();
+                updateStatsDisplay();
+                updateLevelButtons();
+                updateLevelIndicator();
+            }
+        }
+    </script>
+</body>
+</html>

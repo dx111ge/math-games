@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Progressive math learning games for kids with spaced repetition">
+    <meta name="theme-color" content="#667eea">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <title>Math Learning Games</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+        .games {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .game-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .game-card.purple {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .game-card.blue {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .game-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .game-desc {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Math Learning Games</h1>
+        <div class="subtitle">Progressive learning with spaced repetition</div>
+
+        <div class="games">
+            <a href="number-order-v2.html" class="game-card">
+                <div class="game-title">Number Order</div>
+                <div class="game-desc">Learn to count up and down from 0 to 20. Progressive levels unlock as you master each concept.</div>
+            </a>
+
+            <a href="neighbor-numbers-v2.html" class="game-card purple">
+                <div class="game-title">Neighbor Numbers</div>
+                <div class="game-desc">Find x-1 and x+1 for any number. Starts easy, gets harder with more choices!</div>
+            </a>
+
+            <a href="make-ten-v2.html" class="game-card blue">
+                <div class="game-title">Make 10!</div>
+                <div class="game-desc">Find pairs of numbers that add up to 10. The more you struggle, the more you practice!</div>
+            </a>
+        </div>
+
+        <div class="footer">
+            All progress is saved automatically. Come back anytime to continue learning!
+        </div>
+    </div>
+
+    <script>
+        // Register service worker for offline support
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed'));
+        }
+    </script>
+</body>
+</html>
